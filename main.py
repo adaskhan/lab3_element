@@ -1,196 +1,107 @@
 from enum import Enum
-from typing import List
 
 
-class Account(Enum):
-    usd = 'USD'
-    rub = 'RUB'
-    kzt = 'KZT'
-    eur = 'EUR'
+class Currency(Enum):
+    USD = 1
+    RUB = 2
+    KZT = 3
+    EUR = 4
 
 
 class BankAccount:
-    def __init__(self, name, surname, account=Account.kzt, balance=0):
+    def __init__(self, name, surname, account):
         self.name = name
         self.surname = surname
         self.account = account
-        self.balance = balance
 
-    def get_balance(self):
-        print(f'Ваш баланс {round(self.balance, 2)} {self.account.value}')
+    def add_to_bank_account(self, amount):
+        self.account += amount
 
-    def money_conversion(self, amount, valuta):
-        current_wallet_type = self.account.value
-        if current_wallet_type == 'KZT':
-            if valuta == 'KZT':
-                return amount
-            elif valuta == 'RUB':
-                return amount*7.63
-            elif valuta == 'USD':
-                return amount*473.25
-            elif valuta == 'EUR':
-                return amount*497.76
-        elif current_wallet_type == 'RUB':
-            if valuta == 'KZT':
-                return amount*0.13
-            elif valuta == 'RUB':
-                return amount
-            elif valuta == 'USD':
-                return amount*62
-            elif valuta == 'EUR':
-                return amount*65.21
-        elif current_wallet_type == 'EUR':
-            if valuta == 'KZT':
-                return amount*0.002
-            elif valuta == 'RUB':
-                return amount*0.015
-            elif valuta == 'USD':
-                return amount*0.95
-            elif valuta == 'EUR':
-                return amount
-        elif current_wallet_type == 'USD':
-            if valuta == 'KZT':
-                return amount*0.0021
-            elif valuta == 'RUB':
-                return amount*0.016
-            elif valuta == 'USD':
-                return amount
-            elif valuta == 'EUR':
-                return amount*1.05
+    def subtract_from_bank_account(self, amount):
+        self.account -= amount
 
-    def get_account(self):
-        print(f'Тип счета {self.name} {self.surname} - {self.account.value}')
+    def money_conversion(self, currency, rate):
+        self.account = self.account * rate
+        self.currency = currency
 
-    def add_to_bank_account(self, amount, valuta):
-        self.balance += self.money_conversion(amount, valuta)
-        print(f'Счет {self.name} {self.surname} пополнен на {amount} {valuta}')
-        self.get_balance()
+    @property
+    def account(self):
+        return self._account
 
-    def subtract_from_bank_account(self, amount, valuta):
-        self.balance -= self.money_conversion(amount, valuta)
-        print(f'Вы сняли деньги банкомате на сумму {amount} {valuta}')
-        self.get_balance()
+    @account.setter
+    def account(self, value):
+        self._account = value
 
-    def set_balance(self, valuta):
-        current_balance = self.balance
-        current_wallet_type = self.account.value
-        if current_wallet_type == 'KZT':
-            if valuta == 'KZT':
-                return current_balance
-            elif valuta == 'RUB':
-                return current_balance / 7.63
-            elif valuta == 'USD':
-                return current_balance / 473.25
-            elif valuta == 'EUR':
-                return current_balance / 497.76
-        elif current_wallet_type == 'RUB':
-            if valuta == 'KZT':
-                return current_balance / 0.13
-            elif valuta == 'RUB':
-                return current_balance
-            elif valuta == 'USD':
-                return current_balance / 62
-            elif valuta == 'EUR':
-                return current_balance / 65.21
-        elif current_wallet_type == 'EUR':
-            if valuta == 'KZT':
-                return current_balance / 0.002
-            elif valuta == 'RUB':
-                return current_balance / 0.015
-            elif valuta == 'USD':
-                return current_balance / 0.95
-            elif valuta == 'EUR':
-                return current_balance
-        elif current_wallet_type == 'USD':
-            if valuta == 'KZT':
-                return current_balance / 0.0021
-            elif valuta == 'RUB':
-                return current_balance / 0.016
-            elif valuta == 'USD':
-                return current_balance
-            elif valuta == 'EUR':
-                return current_balance / 1.05
+    @property
+    def currency(self):
+        return self._currency
 
-    def set_account(self, valuta):
-        self.balance = self.set_balance(valuta)
-        for acc in Account:
-            if acc.value == valuta:
-                self.account = acc
-        print(f'\nТип счета {self.name} {self.surname} изменен!')
-        print(f'Тип счета {self.name} {self.surname} - {self.account.value}')
-        self.get_balance()
+    @currency.setter
+    def currency(self, value):
+        self._currency = value
 
-    def __del__(self):
-        print(f'Банк аккаунт {self.name} {self.surname} удален!')
-
-
-users: List[BankAccount] = []
-
-
-def choose_user():
-    print()
-    print('Выбрать пользователь...')
-    name = input('name: ')
-    surname = input('surname: ')
-    current_user = BankAccount('user', 'user')
-    wallet_type = Account
-
-    for user in users:
-        if user.name == name and user.surname == surname:
-            current_user = user
-            break
-    else:
-        print('\nПользователь не найден!')
-        return
-
-    while True:
-        print("\n1. Пополнить баланс")
-        print("2. Снять деньги")
-        print("3. Изменить тип счета")
-        print("4. Мой баланс")
-        print("5. Выйти")
-        action = int(input("Выберите ваше действие: "))
-        match action:
-            case 1:
-                amount = int(input("\nСумма: "))
-                valuta = input("Валюта: ")
-                current_user.add_to_bank_account(amount, valuta)
-            case 2:
-                amount = int(input("Сумма: "))
-                valuta = input("Валюта: ")
-                current_user.subtract_from_bank_account(amount, valuta)
-            case 3:
-                print(f'Ваш текущий счет {current_user.account.value}')
-                valuta = input('Валюта: KZT, USD, RUB, EUR: ')
-                current_user.set_account(valuta)
-            case 4:
-                print()
-                current_user.get_balance()
-            case 5:
-                print()
-                main()
-
-
-def create_user():
-    name = input('name: ')
-    surname = input('surname: ')
-    new_user = BankAccount(name, surname)
-    users.append(new_user)
-    choose_user()
+    def __str__(self):
+        return f"Name: {self.name}, Surname: {self.surname}, Account: {self.account} {self.currency.name}"
 
 
 def main():
-    print("1. Создание пользователя")
-    print("2. Выбрать пользователя")
-    print("3. Выйти")
-    action = int(input("Выберите ваше действие: "))
-    if action == 1:
-        create_user()
-    elif action == 2:
-        choose_user()
-    elif action == 3:
-        print('Не выбрали пользователя!')
+    bank_accounts = {}
+
+    while True:
+        print("Choose your action:")
+        print("1. Creating a user")
+        print("2. Select a user")
+        print("3. Exit")
+
+        choice = input()
+
+        if choice == "1":
+            name = input("Enter name: ")
+            surname = input("Enter surname: ")
+            account = float(input("Enter account balance: "))
+            currency = input("Enter currency (USD, RUB, KZT, EUR): ")
+            currency = Currency[currency]
+            bank_account = BankAccount(name, surname, account)
+            bank_account.currency = currency
+            bank_accounts[name] = bank_account
+        elif choice == "2":
+            name = input("Enter name: ")
+            bank_account = bank_accounts.get(name)
+            if bank_account is None:
+                print("User not found")
+            else:
+                while True:
+                    print("Choose your action:")
+                    print("1. Add to bank account")
+                    print("2. Substract from bank account")
+                    print("3. Money conversion")
+                    print("4. Exit")
+
+                    action = input()
+
+                    if action == "1":
+                        amount = float(input("Enter amount to add: "))
+                        bank_account.add_to_bank_account(amount)
+                        print(f'Your amount is {bank_account.account} {bank_account.currency}')
+                    elif action == "2":
+                        amount = float(input("Enter amount to subtract: "))
+                        bank_account.subtract_from_bank_account(amount)
+                        print(f'Your amount is {bank_account.account} {bank_account.currency}')
+                    elif action == "3":
+                        currency = input("Enter currency to convert to (USD, RUB, KZT, EUR): ")
+                        currency = Currency[currency]
+                        rate = float(input("Enter conversion rate: "))
+                        bank_account.money_conversion(currency, rate)
+                        print(f'Your amount is {bank_account.account} {bank_account.currency}')
+                    elif action == "4":
+                        break
+                    else:
+                        print("Invalid choice")
+        elif choice == "3":
+            break
+        else:
+            print("Invalid choice")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
